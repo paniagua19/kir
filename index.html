@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#06162f" />
+  <title>Evaluacion de Fundacion Princesa de Asturias. - Demo</title>
+  <style>
+    :root {
+      --bg1: #020b1c;
+      --bg2: #062044;
+      --card: rgba(4, 18, 42, 0.76);
+      --line: rgba(38, 183, 255, 0.85);
+      --blue: #1aa8ff;
+      --blue2: #1475ff;
+      --green: #20f18b;
+      --green2: #14cc74;
+      --text: #f4f8ff;
+      --muted: #a9c1dd;
+      --danger: #ff8b8b;
+      --shadow: 0 0 0 1px rgba(14, 170, 255, .18), 0 18px 60px rgba(0,0,0,.38);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; min-height: 100%; }
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 80% 11%, rgba(69, 170, 255, .15), transparent 18%),
+        radial-gradient(circle at 20% 30%, rgba(29, 109, 255, .08), transparent 30%),
+        linear-gradient(180deg, var(--bg2) 0%, #03122b 48%, var(--bg1) 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .45;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,.7) 0 1px, transparent 1.4px),
+        radial-gradient(circle, rgba(120,190,255,.4) 0 1px, transparent 1.2px);
+      background-size: 130px 130px, 210px 210px;
+      background-position: 0 0, 40px 65px;
+      mask-image: linear-gradient(to bottom, #000 0%, #000 65%, transparent 100%);
+    }
+
+    .moon {
+      position: fixed;
+      top: 28px;
+      right: 22px;
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 33% 30%, rgba(255,255,255,.9) 0 7%, transparent 8%),
+        radial-gradient(circle at 69% 50%, rgba(80,80,90,.23) 0 6%, transparent 7%),
+        radial-gradient(circle at 38% 70%, rgba(80,80,90,.2) 0 9%, transparent 10%),
+        radial-gradient(circle at 50% 45%, #f4f5f5 0%, #d6d8dc 48%, #aeb2b8 100%);
+      box-shadow: 0 0 35px rgba(222,238,255,.5);
+      z-index: 0;
+    }
+
+    .mountains {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      height: 190px;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .mountain {
+      position: absolute;
+      bottom: -30px;
+      width: 0;
+      height: 0;
+      border-left: 190px solid transparent;
+      border-right: 190px solid transparent;
+      border-bottom: 240px solid #031024;
+      filter: drop-shadow(0 -5px 14px rgba(19, 85, 160, .18));
+    }
+    .m1 { left: -90px; transform: scale(1.05); }
+    .m2 { left: 160px; transform: scale(.82); opacity: .9; }
+    .m3 { left: 340px; transform: scale(1.3); opacity: .75; }
+    .m4 { right: 180px; transform: scale(1.15); opacity: .82; }
+    .m5 { right: -110px; transform: scale(1.05); opacity: .92; }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      width: min(760px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 34px 0 64px;
+    }
+
+    .demo-banner {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      margin: 0 auto 14px;
+      padding: 7px 12px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      color: #d7e5f6;
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .wrap-center { text-align: center; }
+
+    .stats {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 17px;
+      border-radius: 999px;
+      border: 1px solid rgba(19, 169, 255, .85);
+      background: rgba(10, 33, 68, .62);
+      box-shadow: 0 0 24px rgba(12, 155, 255, .18);
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .stats span { font-weight: 500; color: #d8e7fa; font-size: 12px; }
+
+    h1 {
+      font-size: clamp(29px, 6vw, 46px);
+      line-height: 1.04;
+      margin: 17px 0 9px;
+      letter-spacing: -.025em;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 15px;
+      margin: 0 auto 25px;
+      max-width: 560px;
+    }
+
+    .card {
+      border-radius: var(--radius);
+      padding: 22px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+    }
+
+    .screen { display: none; animation: fade .35s ease; }
+    .screen.active { display: block; }
+    @keyframes fade { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: translateY(0);} }
+
+    .field {
+      margin-top: 15px;
+      text-align: left;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #c9dbef;
+      font-weight: 700;
+    }
+    input {
+      width: 100%;
+      border: 1px solid rgba(61, 164, 234, .7);
+      outline: none;
+      color: var(--text);
+      background: rgba(1, 13, 31, .74);
+      padding: 15px 16px;
+      border-radius: 14px;
+      font-size: 16px;
+      transition: .2s ease;
+    }
+    input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(26, 168, 255, .12);
+    }
+    .hint { margin-top: 6px; color: #829ab5; font-size: 11px; }
+
+    .progress-wrap { margin-top: 24px; }
+    .progress-bar {
+      width: 100%;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(58, 91, 128, .62);
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+    }
+    .progress-fill {
+      width: 10%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--green2), var(--green));
+      border-radius: inherit;
+      transition: width .4s linear;
+      box-shadow: 0 0 16px rgba(32, 241, 139, .35);
+    }
+    .progress-meta {
+      margin-top: 9px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+    }
+    .percent { font-weight: 800; color: #fff; }
+    .eta { color: #d7e7fa; }
+
+    .info {
+      margin-top: 18px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      background: rgba(6, 24, 51, .6);
+      color: #a8c2de;
+      font-size: 12px;
+      text-align: center;
+      border: 1px solid rgba(91, 130, 175, .24);
+    }
+
+    .btn {
+      width: 100%;
+      border: 0;
+      cursor: pointer;
+      margin-top: 17px;
+      padding: 15px 18px;
+      border-radius: 999px;
+      color: white;
+      font-size: 16px;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--blue2), var(--blue));
+      box-shadow: 0 10px 25px rgba(20, 117, 255, .25);
+      transition: transform .16s ease, filter .16s ease;
+    }
+    .btn:hover { filter: brightness(1.06); }
+    .btn:active { transform: translateY(1px); }
+    .btn.green {
+      background: linear-gradient(90deg, var(--green2), var(--green));
+      color: #03170f;
+      box-shadow: 0 10px 25px rgba(32, 241, 139, .18);
+    }
+    .btn.secondary {
+      background: rgba(15, 62, 110, .55);
+      border: 1px solid rgba(36, 170, 255, .45);
+      box-shadow: none;
+    }
+
+    .result-icon {
+      width: 66px; height: 66px;
+      margin: 0 auto 12px;
+      display: grid; place-items: center;
+      border-radius: 50%;
+      font-size: 28px;
+      color: #041a10;
+      background: linear-gradient(180deg, #9affc7, #37f09a);
+      box-shadow: 0 0 24px rgba(55, 240, 154, .28);
+    }
+    .result-box {
+      margin-top: 17px;
+      border-radius: 17px;
+      padding: 18px;
+      border: 1px solid rgba(37, 171, 255, .78);
+      background: rgba(2, 15, 36, .72);
+    }
+    .name-display { font-size: 24px; font-weight: 900; }
+    .score-line { margin-top: 6px; font-size: 17px; color: #d3e0ef; }
+    .score {
+      color: var(--green);
+      font-size: 34px;
+      font-weight: 900;
+    }
+
+    .eligibility {
+      margin-top: 8px;
+      color: var(--green);
+      font-size: 26px;
+      font-weight: 900;
+      line-height: 1.2;
+      text-align: center;
+    }
+    .notice {
+      margin-top: 15px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(63, 145, 211, .42);
+      background: rgba(17, 55, 96, .36);
+      color: #c2d7ef;
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: left;
+    }
+    .warning {
+      color: #ffd7a6;
+      border-color: rgba(255, 183, 88, .32);
+      background: rgba(125, 77, 9, .18);
+    }
+
+    .footer {
+      margin-top: 18px;
+      text-align: center;
+      color: #7f9ab9;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 640px) {
+      .app { width: min(100% - 16px, 760px); padding-top: 18px; }
+      .moon { width: 70px; height: 70px; top: 20px; right: 12px; opacity: .85; }
+      .card { padding: 17px; border-radius: 18px; }
+      .row { grid-template-columns: 1fr; gap: 0; }
+      h1 { max-width: 300px; margin-left: auto; margin-right: auto; }
+      .stats { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="moon" aria-hidden="true"></div>
+  <div class="mountains" aria-hidden="true">
+    <div class="mountain m1"></div>
+    <div class="mountain m2"></div>
+    <div class="mountain m3"></div>
+    <div class="mountain m4"></div>
+    <div class="mountain m5"></div>
+  </div>
+
+  <main class="app">
+    <div class="wrap-center">
+      <div class="demo-banner">UNA EVALUACION REAL</div>
+      <div class="stats">👥 5,000,000 <span>de evaluados</span></div>
+      <h1 id="pageTitle">Evaluacion de Fundacion Princesa de Asturias.</h1>
+      <p class="subtitle">Tu esfuerzo hoy, mejores oportunidades manana.</p>
+    </div>
+
+    <!-- Pantalla 1: Nombre -->
+    <section id="screen1" class="screen active card">
+      <div class="field">
+        <label for="name">Ingresa tu nombre</label>
+        <input id="name" type="text" maxlength="80" placeholder="Ej. Rodrigo Perez" autocomplete="name" />
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-bar"><div id="progress" class="progress-fill"></div></div>
+        <div class="progress-meta">
+          <span id="percent" class="percent">10%</span>
+          <span class="eta">Tiempo estimado: 3 horas</span>
+        </div>
+      </div>
+
+      <div class="info">🔒 </div>
+      <button id="startBtn" class="btn">Evaluacion</button>
+    </section>
+
+    <!-- Pantalla 2: Resultado -->
+    <section id="screen2" class="screen card">
+      <div class="wrap-center">
+        <div class="result-icon">✓</div>
+        <h2 style="margin:0;font-size:30px;">¡Evaluacion completada!</h2>
+        <p style="color:var(--muted);margin:8px 0 0;">Resultados</p>
+      </div>
+
+      <div class="result-box">
+        <div id="resultName" class="name-display">Rodrigo Perez</div>
+        <div class="score-line">Calificacion demostrativa: <span class="score">95%</span></div>
+      </div>
+
+      <div class="notice">Usuario compatible.</div>
+      <button id="continueBtn" class="btn">→ Continuar</button>
+    </section>
+
+    <!-- Pantalla 3: Datos -->
+    <section id="screen3" class="screen card">
+      <div class="wrap-center">
+        <div style="font-size:38px; margin-bottom:6px;">📝</div>
+        <h2 style="margin:0;font-size:26px;">Completa tus datos</h2>
+        <p style="color:var(--muted);margin:7px 0 0;">Llena Estos campos.</p>
+      </div>
+
+      <div class="field">
+        <label>Nombre</label>
+        <input id="confirmName" type="text" readonly />
+      </div>
+
+      <div class="field">
+        <label for="phone">Numero de telefono</label>
+        <input id="phone" type="tel" maxlength="30" placeholder="Ej. + 1-305 456-5573" autocomplete="tel" />
+      </div>
+
+      <div class="field">
+        <label for="address">Pais</label>
+        <input id="address" type="text" maxlength="120" placeholder="Ej. Calle Principal #123" autocomplete="street-address" />
+      </div>
+
+      <button id="submitBtn" class="btn green">🧪 Ver resultado</button>
+    </section>
+
+    <!-- Pantalla 4: Final -->
+    <section id="screen4" class="screen card">
+      <div class="wrap-center">
+        <div class="result-icon">✓</div>
+        <h2 style="margin:0;font-size:28px;">!Proceso completado!</h2>
+        <p style="color:var(--muted);margin:8px 0 0;">Vista final</p>
+      </div>
+
+      <div class="result-box">
+        <div id="finalName" class="name-display">Rodrigo Perez</div>
+        <div class="eligibility">El usuario califica para obtener su donacion</div>
+        <div class="notice" style="margin-top:14px;">
+          📱 <strong>Telefono:</strong> <span id="finalPhone">—</span><br>
+          📍 <strong>Pais:</strong> <span id="finalAddress">—</span>
+        </div>
+        <div class="notice warning"><strong>Importante:</strong> Aprobacion completada.</div>
+      </div>
+
+      <button id="restartBtn" class="btn secondary">→ Reiniciar</button>
+    </section>
+
+    <div class="footer">Prototipo.</div>
+  </main>
+
+  <script>
+    const screens = [1,2,3,4].map(n => document.getElementById(`screen${n}`));
+    const nameInput = document.getElementById('name');
+    const progress = document.getElementById('progress');
+    const percent = document.getElementById('percent');
+    const resultName = document.getElementById('resultName');
+    const confirmName = document.getElementById('confirmName');
+    const finalName = document.getElementById('finalName');
+    const phone = document.getElementById('phone');
+    const address = document.getElementById('address');
+    const finalPhone = document.getElementById('finalPhone');
+    const finalAddress = document.getElementById('finalAddress');
+
+    // 3 horas = 10,800,000 ms.
+    // Cambia este valor a 30_000 para probar la simulacion en 30 segundos.
+    const SIMULATION_DURATION = 3 * 60 * 60 * 1000;
+
+    let interval = null;
+
+    function showScreen(index) {
+      screens.forEach((screen, i) => screen.classList.toggle('active', i === index - 1));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetProgress() {
+      clearInterval(interval);
+      progress.style.width = '10%';
+      percent.textContent = '10%';
+    }
+
+    document.getElementById('startBtn').addEventListener('click', () => {
+      const name = nameInput.value.trim();
+      if (!name) {
+        nameInput.focus();
+        nameInput.style.borderColor = '#ff9b9b';
+        return;
+      }
+      nameInput.style.borderColor = '';
+      localStorage.setItem('demoName', name);
+      showScreen(2);
+      resultName.textContent = name;
+      confirmName.value = name;
+      finalName.textContent = name;
+    });
+
+    document.getElementById('continueBtn').addEventListener('click', () => {
+      confirmName.value = localStorage.getItem('demoName') || nameInput.value.trim();
+      showScreen(3);
+    });
+
+    document.getElementById('submitBtn').addEventListener('click', () => {
+      if (!phone.value.trim() || !address.value.trim()) {
+        if (!phone.value.trim()) phone.focus(); else address.focus();
+        return;
+      }
+      finalPhone.textContent = phone.value.trim();
+      finalAddress.textContent = address.value.trim();
+      showScreen(4);
+    });
+
+    document.getElementById('restartBtn').addEventListener('click', () => {
+      nameInput.value = '';
+      phone.value = '';
+      address.value = '';
+      localStorage.removeItem('demoName');
+      resetProgress();
+      showScreen(1);
+    });
+
+    // Modo opcional de demo rapido: agrega ?demo=30 a la URL para que dure 30 segundos.
+    const params = new URLSearchParams(window.location.search);
+    const demoSeconds = Number(params.get('demo'));
+    const duration = Number.isFinite(demoSeconds) && demoSeconds > 0
+      ? demoSeconds * 1000
+      : SIMULATION_DURATION;
+
+    // La barra se inicia automaticamente cuando se carga la pagina, para conservar el aspecto de evaluacion en progreso.
+    const startTime = performance.now();
+    interval = setInterval(() => {
+      const elapsed = performance.now() - startTime;
+      const pct = Math.max(10, Math.min(elapsed / duration, 1) * 100);
+      progress.style.width = pct.toFixed(2) + '%';
+      percent.textContent = Math.floor(pct) + '%';
+
+      if (pct >= 100) {
+        clearInterval(interval);
+        percent.textContent = '100%';
+      }
+    }, 500);
+  </script>
+</body>
+</html>
